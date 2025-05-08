@@ -130,19 +130,19 @@ export default function Home() {
   }, []);
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-7xl">
-      <header className="mb-12 text-center">
+    <div className="container mx-auto px-4 py-8 max-w-7xl bg-gray-50">
+      <header className="mb-8 md:mb-12 text-center px-4">
         <div className="flex flex-col items-center justify-center space-y-2">
-          <h1 className="text-5xl font-bold text-gray-800 tracking-tight">
+          <h1 className="text-4xl md:text-5xl font-bold text-gray-800 tracking-tight">
             Inventory Hub
           </h1>
-          <p className="text-gray-500 text-lg">
-            Simulation of real-time inventory tracking & monitoring
+          <p className="text-gray-500 text-base md:text-lg">
+            Real-time inventory tracking & monitoring
           </p>
         </div>
       </header>
 
-      <main className="space-y-8">
+      <main className="space-y-6 md:space-y-8">
         {loading && (
           <div className="flex items-center justify-center p-8">
             <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-indigo-600 transition-all duration-300 ease-in-out"></div>
@@ -157,9 +157,9 @@ export default function Home() {
         )}
 
         {metrics && (
-          <div className="bg-white shadow-lg rounded-xl p-8 border border-gray-100">
-            <h2 className="text-2xl font-semibold mb-6 text-gray-800">Inventory Overview</h2>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="bg-white shadow-lg rounded-xl p-4 md:p-8 border border-gray-100">
+            <h2 className="text-xl md:text-2xl font-semibold mb-4 md:mb-6 text-gray-800">Inventory Overview</h2>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
               <div className="bg-gradient-to-br from-indigo-50 to-indigo-100 p-6 rounded-xl shadow-sm">
                 <h3 className="text-sm font-medium text-indigo-600 mb-1">Total Products</h3>
                 <p className="text-3xl font-bold text-indigo-700">{metrics.total_products}</p>
@@ -177,9 +177,9 @@ export default function Home() {
         )}
 
         {lowStockProducts.length > 0 && (
-          <div className="bg-white shadow-lg rounded-xl p-8 border border-gray-100">
-            <h2 className="text-2xl font-semibold mb-6 text-gray-800">Low Stock Products</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="bg-white shadow-lg rounded-xl p-4 md:p-8 border border-gray-100">
+            <h2 className="text-xl md:text-2xl font-semibold mb-4 md:mb-6 text-gray-800">Low Stock Products</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
               {lowStockProducts.map((product) => (
                 <div key={product.shopify_id} className="border border-rose-200 rounded-lg p-6 bg-rose-50 shadow-sm">
                   <h3 className="font-semibold mb-4 text-gray-800">{product.title}</h3>
@@ -202,12 +202,12 @@ export default function Home() {
         )}
 
         {products.length > 0 && (
-          <div className="bg-white shadow-lg rounded-xl p-8 border border-gray-100">
-            <h2 className="text-2xl font-semibold mb-6 text-gray-800">All Products</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="bg-white shadow-lg rounded-xl p-4 md:p-8 border border-gray-100">
+            <h2 className="text-xl md:text-2xl font-semibold mb-4 md:mb-6 text-gray-800">All Products</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
               {products.map((product) => (
-                <div key={product.shopify_id} className="border border-gray-200 rounded-lg p-6 hover:border-indigo-200 transition-colors duration-200 shadow-sm">
-                  <h3 className="font-semibold mb-6 text-gray-800 text-center text-lg truncate">
+                <div key={product.shopify_id} className="border border-gray-200 rounded-lg p-4 md:p-6 hover:border-indigo-200 transition-colors duration-200 shadow-sm">
+                  <h3 className="font-semibold mb-4 md:mb-6 text-gray-800 text-center text-base md:text-lg truncate">
                     {product.title}
                   </h3>
                   <div className="space-y-3">
@@ -239,7 +239,7 @@ export default function Home() {
                     </div>
                     <div className="flex justify-between items-center">
                       <span className="text-sm text-gray-600">Price:</span>
-                      <span className="text-sm font-medium text-gray-800">${product.price}</span>
+                      <span className="text-sm font-medium text-gray-800">£{product.price}</span>
                     </div>
                     <div className="flex justify-between items-center">
                       <span className="text-sm text-gray-600">Last Updated:</span>
@@ -255,22 +255,28 @@ export default function Home() {
         )}
 
         {syncStatus && (
-          <div className="mt-8 text-sm text-gray-500 bg-gray-50 rounded-lg p-4 transition-all duration-300 ease-in-out">
-            <div className="flex items-center justify-between">
-              <span className="font-medium">Sync Status:</span>
-              <div className="flex items-center space-x-2">
-                <div className={`h-2 w-2 rounded-full transition-colors duration-700 ease-in-out ${
-                  isSyncing 
-                    ? 'bg-indigo-500 animate-[pulse_2s_ease-in-out_infinite]' 
-                    : 'bg-emerald-500'
-                }`}></div>
+          <>
+            <div className="mt-6 md:mt-8 text-xs md:text-sm text-gray-500 bg-white rounded-lg p-3 md:p-4 transition-all duration-300 ease-in-out">
+              <div className="flex items-center justify-between">
+                <span className="font-medium">Sync Status:</span>
                 <span>
                   Last synchronized {formatDistanceToNow(new Date(syncStatus.last_sync ?? syncStatus.timestamp ?? new Date()), { addSuffix: true })}
                   {' '} at {new Date(syncStatus.last_sync ?? syncStatus.timestamp ?? new Date()).toLocaleTimeString()}
                 </span>
               </div>
             </div>
-          </div>
+            <div className="mt-4 text-xs text-gray-400 flex items-center justify-center space-x-2">
+              <span>Created by Zac Schmidt</span>
+              <a 
+                href="https://www.linkedin.com/in/zac-schmidt-b35b05284/" 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                className="text-indigo-400 hover:text-indigo-500 transition-colors duration-200"
+              >
+                LinkedIn
+              </a>
+            </div>
+          </>
         )}
       </main>
     </div>
