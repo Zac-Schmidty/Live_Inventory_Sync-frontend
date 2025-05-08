@@ -8,11 +8,12 @@ interface Product {
   shopify_id: number;
   title: string;
   inventory: number;
+  old_inventory: number;
+  inventory_change: number;
   inventory_management: string;
   inventory_policy: string;
   price: number;
   last_synced: string;
-  // Add any other inventory-related fields from your backend
 }
 
 interface InventoryMetrics {
@@ -136,7 +137,7 @@ export default function Home() {
             Inventory Hub
           </h1>
           <p className="text-gray-500 text-lg">
-            Real-time inventory tracking & monitoring
+            Simulation of real-time inventory tracking & monitoring
           </p>
         </div>
       </header>
@@ -206,16 +207,30 @@ export default function Home() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {products.map((product) => (
                 <div key={product.shopify_id} className="border border-gray-200 rounded-lg p-6 hover:border-indigo-200 transition-colors duration-200 shadow-sm">
-                  <h3 className="font-semibold mb-4 text-gray-800">{product.title}</h3>
+                  <h3 className="font-semibold mb-6 text-gray-800 text-center text-lg truncate">
+                    {product.title}
+                  </h3>
                   <div className="space-y-3">
-                    <div className="flex justify-between items-center">
-                      <span className="text-sm text-gray-600">Current Stock:</span>
-                      <span className={`font-medium ${
+                    <div className="flex justify-between items-center bg-gray-50 p-3 rounded-lg">
+                      <span className="text-gray-700 font-medium">Current Stock:</span>
+                      <span className={`text-lg font-bold ${
                         product.inventory <= 10 
                           ? 'text-rose-600' 
                           : 'text-emerald-600'
                       }`}>
                         {product.inventory}
+                      </span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm text-gray-600">Stock Change:</span>
+                      <span className={`text-sm font-medium ${
+                        product.inventory_change > 0 
+                          ? 'text-emerald-600' 
+                          : product.inventory_change < 0 
+                            ? 'text-rose-600'
+                            : 'text-gray-500'
+                      }`}>
+                        {product.inventory_change > 0 ? '+' : ''}{product.inventory_change}
                       </span>
                     </div>
                     <div className="flex justify-between items-center">
