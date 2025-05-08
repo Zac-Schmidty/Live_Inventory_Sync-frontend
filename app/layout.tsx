@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "Shopify App",
-  description: "Your custom Shopify application",
+  description: "Real-time inventory tracking & monitoring",
 };
 
 export default function RootLayout({

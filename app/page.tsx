@@ -144,12 +144,12 @@ export default function Home() {
       <main className="space-y-8">
         {loading && (
           <div className="flex items-center justify-center p-8">
-            <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-indigo-600"></div>
+            <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-indigo-600 transition-all duration-300 ease-in-out"></div>
           </div>
         )}
 
         {error && (
-          <div className="bg-red-50 border border-red-200 text-red-700 px-6 py-4 rounded-lg shadow-sm">
+          <div className="bg-red-50 border border-red-200 text-red-700 px-6 py-4 rounded-lg shadow-sm transition-all duration-300 ease-in-out">
             <p className="font-semibold">Error:</p>
             <p>{error}</p>
           </div>
@@ -240,13 +240,20 @@ export default function Home() {
         )}
 
         {syncStatus && (
-          <div className="mt-8 text-sm text-gray-500 bg-gray-50 rounded-lg p-4">
+          <div className="mt-8 text-sm text-gray-500 bg-gray-50 rounded-lg p-4 transition-all duration-300 ease-in-out">
             <div className="flex items-center justify-between">
               <span className="font-medium">Sync Status:</span>
-              <span>
-                Last synchronized {formatDistanceToNow(new Date(syncStatus.last_sync ?? syncStatus.timestamp ?? new Date()), { addSuffix: true })}
-                {' '} at {new Date(syncStatus.last_sync ?? syncStatus.timestamp ?? new Date()).toLocaleTimeString()}
-              </span>
+              <div className="flex items-center space-x-2">
+                <div className={`h-2 w-2 rounded-full transition-colors duration-700 ease-in-out ${
+                  isSyncing 
+                    ? 'bg-indigo-500 animate-[pulse_2s_ease-in-out_infinite]' 
+                    : 'bg-emerald-500'
+                }`}></div>
+                <span>
+                  Last synchronized {formatDistanceToNow(new Date(syncStatus.last_sync ?? syncStatus.timestamp ?? new Date()), { addSuffix: true })}
+                  {' '} at {new Date(syncStatus.last_sync ?? syncStatus.timestamp ?? new Date()).toLocaleTimeString()}
+                </span>
+              </div>
             </div>
           </div>
         )}
