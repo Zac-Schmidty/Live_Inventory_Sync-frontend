@@ -22,11 +22,17 @@ interface InventoryMetrics {
   // Add other metrics as needed
 }
 
+interface SyncStatus {
+  last_sync?: string;
+  timestamp?: string;
+  status?: string;
+}
+
 export default function Home() {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [syncStatus, setSyncStatus] = useState<any>(null);
+  const [syncStatus, setSyncStatus] = useState<SyncStatus | null>(null);
   const [isSyncing, setIsSyncing] = useState(false);
   const [lowStockProducts, setLowStockProducts] = useState<Product[]>([]);
   const [metrics, setMetrics] = useState<InventoryMetrics | null>(null);
@@ -47,6 +53,15 @@ export default function Home() {
   const fetchSyncStatus = async () => {
     try {
       const status = await api.get('/sync/status');
+      // Adjust the timestamp for BST
+      if (status.last_sync) {
+        const timestamp = new Date(status.last_sync);
+        status.last_sync = new Date(timestamp.getTime() + 3600000).toISOString();
+      }
+      if (status.timestamp) {
+        const timestamp = new Date(status.timestamp);
+        status.timestamp = new Date(timestamp.getTime() + 3600000).toISOString();
+      }
       setSyncStatus(status);
     } catch (err) {
       console.error('Error fetching sync status:', err);
@@ -79,7 +94,9 @@ export default function Home() {
     try {
       await api.post('/sync/trigger', {});
       await fetchSyncStatus();
-      await fetchProducts(); // Refresh products after sync
+      await fetchProducts();
+      await fetchLowStockProducts();
+      await fetchInventoryMetrics();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to trigger sync');
     } finally {
@@ -88,24 +105,39 @@ export default function Home() {
   };
 
   useEffect(() => {
+    // Initial fetch
     fetchProducts();
     fetchSyncStatus();
     fetchLowStockProducts();
     fetchInventoryMetrics();
+
+    // Set up auto-sync interval (5 minutes = 300000 milliseconds)
+    const intervalId = setInterval(async () => {
+      try {
+        await api.post('/sync/trigger', {});
+        await fetchSyncStatus();
+        await fetchProducts();
+        await fetchLowStockProducts();
+        await fetchInventoryMetrics();
+      } catch (err) {
+        console.error('Auto-sync failed:', err);
+      }
+    }, 3000);
+
+    // Cleanup interval on component unmount
+    return () => clearInterval(intervalId);
   }, []);
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-7xl">
-      <header className="mb-12">
-        <div className="flex justify-between items-center">
-          <h1 className="text-4xl font-bold text-gray-800">Inventory Dashboard</h1>
-          <button
-            onClick={triggerSync}
-            disabled={isSyncing}
-            className="bg-indigo-600 text-white px-6 py-2.5 rounded-lg hover:bg-indigo-700 disabled:bg-indigo-300 transition-colors duration-200 shadow-sm"
-          >
-            {isSyncing ? 'Syncing...' : 'Sync Products'}
-          </button>
+      <header className="mb-12 text-center">
+        <div className="flex flex-col items-center justify-center space-y-2">
+          <h1 className="text-5xl font-bold text-gray-800 tracking-tight">
+            Inventory Hub
+          </h1>
+          <p className="text-gray-500 text-lg">
+            Real-time inventory tracking & monitoring
+          </p>
         </div>
       </header>
 
@@ -197,7 +229,7 @@ export default function Home() {
                     <div className="flex justify-between items-center">
                       <span className="text-sm text-gray-600">Last Updated:</span>
                       <span className="text-sm text-gray-500">
-                        {formatDistanceToNow(new Date(product.last_synced), { addSuffix: true })}
+                        {formatDistanceToNow(new Date(new Date(product.last_synced).getTime() + 3600000), { addSuffix: true })}
                       </span>
                     </div>
                   </div>
@@ -212,8 +244,8 @@ export default function Home() {
             <div className="flex items-center justify-between">
               <span className="font-medium">Sync Status:</span>
               <span>
-                Last synchronized {formatDistanceToNow(new Date(syncStatus.last_sync || syncStatus.timestamp), { addSuffix: true })}
-                {' '} at {new Date(syncStatus.last_sync || syncStatus.timestamp).toLocaleTimeString()}
+                Last synchronized {formatDistanceToNow(new Date(syncStatus.last_sync ?? syncStatus.timestamp ?? new Date()), { addSuffix: true })}
+                {' '} at {new Date(syncStatus.last_sync ?? syncStatus.timestamp ?? new Date()).toLocaleTimeString()}
               </span>
             </div>
           </div>
