@@ -37,6 +37,7 @@ export default function Home() {
   const [isSyncing, setIsSyncing] = useState(false);
   const [lowStockProducts, setLowStockProducts] = useState<Product[]>([]);
   const [metrics, setMetrics] = useState<InventoryMetrics | null>(null);
+  const [searchTerm, setSearchTerm] = useState('');
 
   const fetchProducts = async () => {
     try {
@@ -104,6 +105,11 @@ export default function Home() {
       setIsSyncing(false);
     }
   };
+
+  const filteredProducts = products.filter(product => 
+    product.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    product.shopify_id.toString().includes(searchTerm)
+  );
 
   useEffect(() => {
     // Initial fetch
@@ -204,8 +210,24 @@ export default function Home() {
         {products.length > 0 && (
           <div className="bg-white shadow-lg rounded-xl p-4 md:p-8 border border-gray-100">
             <h2 className="text-xl md:text-2xl font-semibold mb-4 md:mb-6 text-gray-800">All Products</h2>
+            <div className="mb-6">
+              <div className="relative">
+                <input
+                  type="text"
+                  placeholder="Search by title or ID..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                />
+                <div className="absolute inset-y-0 right-0 flex items-center pr-3">
+                  <svg className="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                  </svg>
+                </div>
+              </div>
+            </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
-              {products.map((product) => (
+              {filteredProducts.map((product) => (
                 <div key={product.shopify_id} className="border border-gray-200 rounded-lg p-4 md:p-6 hover:border-indigo-200 transition-colors duration-200 shadow-sm">
                   <h3 className="font-semibold mb-4 md:mb-6 text-gray-800 text-center text-base md:text-lg truncate">
                     {product.title}
