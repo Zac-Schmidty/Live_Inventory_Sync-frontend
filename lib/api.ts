@@ -1,4 +1,5 @@
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
+//const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
+const API_BASE_URL = "https://web-production-ac03.up.railway.app";
 
 export const api = {
   async get(endpoint: string) {
