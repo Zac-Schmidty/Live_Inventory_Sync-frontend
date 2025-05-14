@@ -115,7 +115,7 @@ export default function Home() {
   useEffect(() => {
     const fetchAndUpdate = async () => {
       try {
-        const apiUrl = `${process.env.NEXT_PUBLIC_API_URL}/sync/trigger`;
+        const apiUrl = `${process.env.NEXT_PUBLIC_API_URL}sync/trigger`;
         console.log('Attempting sync with URL:', apiUrl);
 
         const response = await fetch(apiUrl, {
