@@ -149,7 +149,7 @@ export default function Home() {
     };
 
     fetchAndUpdate();
-    const intervalId = setInterval(fetchAndUpdate, 300000);
+    const intervalId = setInterval(fetchAndUpdate, 5000);
     return () => clearInterval(intervalId);
   }, []);
 
