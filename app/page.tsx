@@ -29,6 +29,22 @@ interface SyncStatus {
   status?: string;
 }
 
+type SyncResponse = {
+  status: 'success' | 'error';
+  products_updated?: number;
+  products_created?: number;
+  error?: string;
+  timestamp: string;
+};
+
+declare global {
+  namespace NodeJS {
+    interface ProcessEnv {
+      NEXT_PUBLIC_API_URL: string;
+    }
+  }
+}
+
 export default function Home() {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
@@ -106,11 +122,27 @@ export default function Home() {
     // Set up auto-sync interval (5 minutes = 300000 milliseconds)
     const intervalId = setInterval(async () => {
       try {
-        await api.post('/sync/trigger', {});
-        await fetchSyncStatus();
-        await fetchProducts();
-        await fetchLowStockProducts();
-        await fetchInventoryMetrics();
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/sync/trigger`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          credentials: 'include',
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const syncResult: SyncResponse = await response.json();
+        if (syncResult.status === 'success') {
+          await fetchSyncStatus();
+          await fetchProducts();
+          await fetchLowStockProducts();
+          await fetchInventoryMetrics();
+        } else {
+          console.error('Sync failed:', syncResult.error);
+        }
       } catch (err) {
         console.error('Auto-sync failed:', err);
       }
