@@ -113,19 +113,16 @@ export default function Home() {
   );
 
   useEffect(() => {
-    // Initial fetch
-    fetchProducts();
-    fetchSyncStatus();
-    fetchLowStockProducts();
-    fetchInventoryMetrics();
-
-    // Set up auto-sync interval (5 minutes = 300000 milliseconds)
-    const intervalId = setInterval(async () => {
+    const fetchAndUpdate = async () => {
       try {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/sync/trigger`, {
+        // Create URL object to ensure proper formatting
+        const apiUrl = new URL('/sync/trigger', process.env.NEXT_PUBLIC_API_URL);
+        
+        const response = await fetch(apiUrl.toString(), {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
+            'Accept': 'application/json',
           },
           credentials: 'include',
         });
@@ -140,15 +137,17 @@ export default function Home() {
           await fetchProducts();
           await fetchLowStockProducts();
           await fetchInventoryMetrics();
-        } else {
-          console.error('Sync failed:', syncResult.error);
         }
       } catch (err) {
         console.error('Auto-sync failed:', err);
       }
-    }, 3000);
+    };
 
-    // Cleanup interval on component unmount
+    // Initial fetch
+    fetchAndUpdate();
+
+    // Set up auto-sync interval
+    const intervalId = setInterval(fetchAndUpdate, 300000);
     return () => clearInterval(intervalId);
   }, []);
 
