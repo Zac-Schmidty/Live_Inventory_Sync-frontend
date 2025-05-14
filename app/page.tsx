@@ -91,21 +91,6 @@ export default function Home() {
     }
   };
 
-  const triggerSync = async () => {
-    setIsSyncing(true);
-    try {
-      await api.post('/sync/trigger', {});
-      await fetchSyncStatus();
-      await fetchProducts();
-      await fetchLowStockProducts();
-      await fetchInventoryMetrics();
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to trigger sync');
-    } finally {
-      setIsSyncing(false);
-    }
-  };
-
   const filteredProducts = products.filter(product => 
     product.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
     product.shopify_id.toString().includes(searchTerm)
