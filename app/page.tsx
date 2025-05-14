@@ -89,7 +89,7 @@ export default function Home() {
   const fetchLowStockProducts = async () => {
     try {
       const baseUrl = process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, '');
-      const response = await fetch(`${baseUrl}/products?low_stock=true&threshold=10`, {
+      const response = await fetch(`${baseUrl}/products/low-stock`, {
         headers: {
           'Content-Type': 'application/json',
         },
@@ -97,7 +97,9 @@ export default function Home() {
       });
 
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        const errorText = await response.text();
+        console.error('API Error response:', errorText);
+        throw new Error(`API Error: ${response.status} ${response.statusText}`);
       }
 
       const data = await response.json();
