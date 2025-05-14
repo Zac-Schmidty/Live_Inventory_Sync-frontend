@@ -89,12 +89,20 @@ export default function Home() {
   const fetchLowStockProducts = async () => {
     try {
       const baseUrl = process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, '');
-      const response = await fetch(`${baseUrl}/products/low-stock`, {
+      const url = `${baseUrl}/products/low-stock?threshold=10`;
+      console.log('Fetching low stock products from:', url);
+
+      const response = await fetch(url, {
+        method: 'GET',  // Explicitly set method
         headers: {
           'Content-Type': 'application/json',
+          'Accept': 'application/json',
         },
         credentials: 'include',
       });
+
+      console.log('Response status:', response.status);
+      console.log('Response headers:', Object.fromEntries(response.headers));
 
       if (!response.ok) {
         const errorText = await response.text();
@@ -103,6 +111,13 @@ export default function Home() {
       }
 
       const data = await response.json();
+      console.log('Received low stock products:', data);
+      
+      if (!Array.isArray(data)) {
+        console.error('Expected array of products but received:', typeof data);
+        return;
+      }
+
       setLowStockProducts(data);
     } catch (err) {
       console.error('Error fetching low stock products:', err);
