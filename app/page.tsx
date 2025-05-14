@@ -88,10 +88,21 @@ export default function Home() {
 
   const fetchLowStockProducts = async () => {
     try {
-      const response = await api.get('/products?low_stock=true&threshold=10');
-      // Filter products to only include those with inventory below 10
-      const lowStockItems = response.filter((product: Product) => product.inventory < 10);
-      setLowStockProducts(lowStockItems);
+      const baseUrl = process.env.NEXT_PUBLIC_API_URL?.replace('http://', 'https://');
+      const response = await fetch(`${baseUrl}/products/?low_stock=true&threshold=10`, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        redirect: 'follow', // Explicitly follow redirects
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      setLowStockProducts(data);
     } catch (err) {
       console.error('Error fetching low stock products:', err);
     }
