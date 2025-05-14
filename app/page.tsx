@@ -88,13 +88,12 @@ export default function Home() {
 
   const fetchLowStockProducts = async () => {
     try {
-      const baseUrl = process.env.NEXT_PUBLIC_API_URL?.replace('http://', 'https://');
-      const response = await fetch(`${baseUrl}/products/?low_stock=true&threshold=10`, {
+      const baseUrl = process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, '');
+      const response = await fetch(`${baseUrl}/products?low_stock=true&threshold=10`, {
         headers: {
           'Content-Type': 'application/json',
         },
         credentials: 'include',
-        redirect: 'follow', // Explicitly follow redirects
       });
 
       if (!response.ok) {
