@@ -115,23 +115,28 @@ export default function Home() {
   useEffect(() => {
     const fetchAndUpdate = async () => {
       try {
-        // Create URL object to ensure proper formatting
-        const apiUrl = new URL('/sync/trigger', process.env.NEXT_PUBLIC_API_URL);
-        
-        const response = await fetch(apiUrl.toString(), {
+        const apiUrl = `${process.env.NEXT_PUBLIC_API_URL}/sync/trigger`;
+        console.log('Attempting sync with URL:', apiUrl);
+
+        const response = await fetch(apiUrl, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'Accept': 'application/json',
           },
-          credentials: 'include',
+          // Removing credentials and mode to see if they're causing the issue
         });
 
+        console.log('Response status:', response.status);
+
         if (!response.ok) {
+          const errorText = await response.text();
+          console.error('Error response:', errorText);
           throw new Error(`HTTP error! status: ${response.status}`);
         }
 
         const syncResult: SyncResponse = await response.json();
+        console.log('Sync result:', syncResult);
+
         if (syncResult.status === 'success') {
           await fetchSyncStatus();
           await fetchProducts();
@@ -143,10 +148,7 @@ export default function Home() {
       }
     };
 
-    // Initial fetch
     fetchAndUpdate();
-
-    // Set up auto-sync interval
     const intervalId = setInterval(fetchAndUpdate, 300000);
     return () => clearInterval(intervalId);
   }, []);
